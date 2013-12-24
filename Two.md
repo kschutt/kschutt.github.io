@@ -1,3 +1,7 @@
+---
+title: Two.
+---
+
 # Two.
 
 The name of this story is two because of what there is that exists that there are two of. What exists is what can and will end a life. A life taken by another or by its own self. Whomever it was, they are no more as you are reading. That should suit you while you ponder the life of that life. A waste. A prophet. Only one will know the truth and that one is not you. You will not understand what it means to be that person for what that life has done and experienced is not what you will do or experience. You are not them. They are not you. You should be honored to be receiving and reading the information herein because it is of a rare value to see the memories of another. To experience the joy, love, and hate through another. This is a story of that struggle.
