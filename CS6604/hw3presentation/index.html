@@ -120,9 +120,9 @@
 						<h2>OpenStreetMaps (OSM)</h2>
 						<ul>
 							<li>Open Source</li>
-							<li>Must use a <a href="http://wiki.openstreetmap.org/wiki/Develop/Frameworks#Webmaps">Webmap</a> like OpenLayers</li>
+							<li>Must use a <a href="http://wiki.openstreetmap.org/wiki/Develop/Frameworks#Webmaps" target="new">Webmap</a> like OpenLayers</li>
 							<li>JavaScript API's available</li>
-							<li>Geospatial services offered through <a href="http://developer.mapquest.com/">MapQuest</a></li>
+							<li>Geospatial services offered through <a href="http://developer.mapquest.com/" target="new">MapQuest</a></li>
 							<ul>
 								<li>Unlimited requests for all services when using open data</li>
 							</ul>
@@ -194,7 +194,7 @@
 							More robust and can search on a polygon with multiple lat-lon pairs. However, this is only obtaining "places" information from twitter and not tweets.
 						</p>
 						<p>
-							Subject to Twitter's Rate Limiting found <a href="https://dev.twitter.com/docs/rate-limiting/1">here</a>
+							Subject to Twitter's Rate Limiting found <a href="https://dev.twitter.com/docs/rate-limiting/1" target="new">here</a>
 						</p>
 					</section>
 					<section>
@@ -258,7 +258,7 @@ private bool IsPointInPolygon(PointF point)
 					<section>
 						<h2>Facebook API</h2>
 						<p>
-						 Usage limits can be found <a href="https://developers.facebook.com/docs/reference/ads-api/api-rate-limiting/">here</a>
+						 Usage limits can be found <a href="https://developers.facebook.com/docs/reference/ads-api/api-rate-limiting/" target="new">here</a>
 						</p>
 						<p>
 						 Graph API allows you to search for places and objects (in general) where <code>distance</code> is in meters
@@ -280,6 +280,32 @@ private bool IsPointInPolygon(PointF point)
 						</section>
 					<section>
 						<h2>Foursquare API</h2>
+						<p>
+						 Usage limits can be found <a href="https://developer.foursquare.com/overview/ratelimits" target="new">here</a>
+						</p>
+						<p>
+							<b>Push notifications</b> are available but only if the app is authorized by the venue.
+						</p>
+						<p>
+							<b>Streaming</b> of anonymous information is hosted by <a href="http://gnip.com/sources/foursquare/">Gnip</a> and only available to companies willing to pay at least $500. Note: it also has data from a number of other social media sources.
+						</p>
+						<p>
+							Leaving us only with <b>Search</b> which has multiple ways to query geospatially.
+						</p>
+					</section>
+					<section>
+						<h2>Foursquare Search API</h2>
+						<p> More details <a href="https://developer.foursquare.com/docs/venues/search" target="new">here</a>
+						</p>
+						<p>
+						 Users can utilize one of the following parameters when querying:
+						 <ul>
+						 <li><code>ll</code> - Location</li>
+						 <li><code>near</code> - A place name, e.g., Washington, DC</li>
+						 <li><code>radius</code> - Used with <code>ll</code> and in meters</li>
+						 <li><code>sw</code>  and <code>ne</code> - A bounding quadrangle with an area &lt; 10,000 km</li>
+						 </ul>
+						</p>
 					</section>
 					<section>
 						<h2>Gotcha's</h2>
@@ -341,18 +367,18 @@ private bool IsPointInPolygon(PointF point)
 						</p>
 						<pre>
 							<code data-trim contenteditable>
-								SELECT      
-								st_FlipCoordinates(st_intersection(a.the_geom, b.the_geom))
-								FROM
-								"opengeo"."VBMP_RCL_SHP" as a,
-								"opengeo"."VBMP_RCL_SHP" as b
-								WHERE
-								a."SN_FULL" % '%primary_name%'
-								and b."SN_FULL" % '%secondary_name%'
-								AND ST_Touches(a.the_geom, b.the_geom)
-								AND a.fid != b.fid
-								GROUP BY
-								st_FlipCoordinates(st_intersection(a.the_geom, b.the_geom))
+SELECT      
+  st_FlipCoordinates(st_intersection(a.the_geom, b.the_geom))
+FROM
+  "opengeo"."VBMP_RCL_SHP" as a,
+  "opengeo"."VBMP_RCL_SHP" as b
+WHERE
+  a."SN_FULL" % '%primary_name%'
+  and b."SN_FULL" % '%secondary_name%'
+  AND ST_Touches(a.the_geom, b.the_geom)
+  AND a.fid != b.fid
+GROUP BY
+  st_FlipCoordinates(st_intersection(a.the_geom, b.the_geom))
 							</code>
 						</pre>
 					</section>
@@ -363,16 +389,19 @@ private bool IsPointInPolygon(PointF point)
 						</p>
 						<pre>
 							<code data-trim contenteditable>
-								SELECT
-								a.fid, a."SN_FULL", a."VDOT_RNUM", st_flipcoordinates(st_buffer(a.the_geom,0.000000000001))  as the_geom
-								FROM
-								"opengeo"."VBMP_RCL_SHP" as a
-								WHERE
-								st_intersects(a.the_geom, st_buffer(st_pointfromtext('POINT(%lat_lon%)',4269), 0.0005))
-								ORDER BY
-								st_distance(st_pointfromtext('POINT(%lat_lon%)',4269), a.the_geom)
+SELECT
+  a.fid, a."SN_FULL", a."VDOT_RNUM", st_flipcoordinates(st_buffer(a.the_geom,0.000000000001))  as the_geom
+FROM
+  "opengeo"."VBMP_RCL_SHP" as a
+WHERE
+  st_intersects(a.the_geom, st_buffer(st_pointfromtext('POINT(%lat_lon%)',4269), 0.0005))
+ORDER BY
+  st_distance(st_pointfromtext('POINT(%lat_lon%)',4269), a.the_geom)
 							</code>
 						</pre>
+						<p>
+							Note: the use of a really small <code>st_buffer</code> is required in this case because of a weird processing error with <code>st_flipcoordinates</code>
+						</p>
 					</section>
 					<section>
 						<h2>Example: Using OpenLayers</h2>
@@ -381,19 +410,19 @@ private bool IsPointInPolygon(PointF point)
 						</p>
 						<pre>
 							<code data-trim contenteditable>
-								var map = new Openlayers.Map('map');
-								var rcl = new OpenLayers.Layer.WMS("RoadCenterLines", "//ogs_host_name/wms", {
-								layers : [
-								'opengeo:NHPN_STFIPS_51', 
-								'opengeo:SDE_VDOT_RTE_OVERLAP_LRS', 
-								'opengeo:VBMP_RCL_SHP0'
-								],
-								format : 'image/png',
-								transparent : true
-							}, {
-							isBaseLayer : false
-						});
-						map.addLayers([rcl]);
+var map = new Openlayers.Map('map');
+var rcl = new OpenLayers.Layer.WMS("RoadCenterLines", "//ogs_host_name/wms", {
+    layers : [
+      'opengeo:NHPN_STFIPS_51', 
+      'opengeo:SDE_VDOT_RTE_OVERLAP_LRS', 
+      'opengeo:VBMP_RCL_SHP0'
+    ],
+    format : 'image/png',
+    transparent : true
+  }, {
+    isBaseLayer : false
+  });
+map.addLayers([rcl]);
 					</code>
 				</pre>
 			</section>
