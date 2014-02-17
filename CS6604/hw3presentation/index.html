@@ -51,6 +51,7 @@
 						<li style="text-decoration: line-through">HPC and Parallel Processing</li>
 						<li>Desktop Applications and Mobile SDK's</li>
 						<li>Web Services</li>
+						<li>Social Media Services</li>
 						<li>Databases</li>
 						<li>Full Stack Solutions</li>
 					</ul>
@@ -68,12 +69,14 @@
 					<section data-background="img/qgis.png">
 						<h2 style="background: black; padding: 5px">QGIS</h2>
 					</section>
+				</section>
+				<section>
 					<section>
 						<h2>Mobile SDK's</h2>
 						<ul>
-						<li>iOS Maps SDK</li>
-						<li>Android Maps SDK</li>
-						<li>Google Maps SDK for iOS</li>
+							<li>iOS Maps SDK</li>
+							<li>Android Maps SDK</li>
+							<li>Google Maps SDK for iOS</li>
 						</ul>
 					</section>
 					<section>
@@ -170,6 +173,118 @@
 				</section>
 				<section>
 					<section>
+						<h2>Social Media Services</h2>
+						<ul>
+						<li>Twitter API's</li>
+						<li>Facebook API</li>
+						<li>Foursquare API</li>
+						</ul>
+					</section>
+					<section>
+						<h2>Twitter API</h2>
+						<h3>Streaming API</h3>
+						<p>
+							Allows for the user to specify the minimum bounding box for a specific location in the following format <code>MinLongitude,MinLatitude,MaxLongitude,MaxLatitude</code>
+						</p>
+						<p>
+							No limitations since you just open a web socket and ingest the data.
+						</p>
+						<h3>Places API</h3>
+						<p>
+							More robust and can search on a polygon with multiple lat-lon pairs. However, this is only obtaining "places" information from twitter and not tweets.
+						</p>
+						<p>
+							Subject to Twitter's Rate Limiting found <a href="https://dev.twitter.com/docs/rate-limiting/1">here</a>
+						</p>
+					</section>
+					<section>
+						<h2>Twitter Streaming API Gotcha's</h2>
+						<p>
+						Must verify that the received coordinates are correct and within the provided bounding box
+						</p>
+						<pre><code>
+	private bool ValidLatitude(double latitude)
+        {
+            return latitude >= -90 &amp;&amp; latitude <= 90;
+        }
+        
+        private bool ValidLongitude(double longitude)
+        {
+            return longitude >= -180 &amp;&amp; longitude <= 180;
+        }
+        
+        private bool IsValidInBoundingBox(Coordinate coordinate)
+        {
+            return coordinate.Latitude <= NortheastLatitude 
+            	&amp;&amp; coordinate.Latitude >= SouthwestLatitude
+                &amp;&amp; coordinate.Longitude <= NortheastLongitude 
+                &amp;&amp; coordinate.Longitude >= SouthwestLongitude;
+        }							
+						</code></pre>
+					</section>
+					<section>
+						<h2>Twitter Streaming API with Polygon</h2>
+						<p>
+						After the coordinates are verified, we can check against the bounds of a polygon (i.e. Point in Polygon)
+						</p>
+						<pre><code>
+KmlFile file = KmlFile.Load(_kmlPath);
+polygonCoords = new List&lt;PointF&gt;();
+foreach (var poly in file.Root.Flatten().OfType&lt;Polygon&gt;())
+{
+    foreach (var coord in poly.OuterBoundary.LinearRing.Coordinates)
+    {
+        polygonCoords.Add(new PointF((float)coord.Longitude, (float)coord.Latitude));
+    }
+}
+
+private bool IsPointInPolygon(PointF point)
+{
+    PointF[] polygon = polygonCoords.ToArray();
+    bool isInside = false;
+    for (int i = 0, j = polygon.Length - 1; i &lt; polygon.Length; j = i++)
+    {
+        if (((polygon[i].Y &gt; point.Y) != (polygon[j].Y &gt; point.Y)) &amp;&amp
+        (point.X &lt; (polygon[j].X - polygon[i].X) * (point.Y - polygon[i].Y) / 
+        (polygon[j].Y - polygon[i].Y) + polygon[i].X))
+        {
+            isInside = !isInside;
+        }
+    }
+    return isInside;
+}				
+						</code></pre>
+					</section>
+					<section>
+						<h2>Facebook API</h2>
+						<p>
+						 Usage limits can be found <a href="https://developers.facebook.com/docs/reference/ads-api/api-rate-limiting/">here</a>
+						</p>
+						<p>
+						 Graph API allows you to search for places and objects (in general) where <code>distance</code> is in meters
+						</p>
+						<pre><code>https://graph.facebook.com/search?type=location&amp;center=37.76,-122.427&amp;distance=1000</code></pre>
+						<p>
+						 Note: You will most likely still need to verify the locations found.
+						</p>
+					</section>
+					<section>
+						<h2>Foursquare API</h2>
+					</section>
+					<section>
+						<h2>Gotcha's</h2>
+						<p>
+							There are a few issues with using the data from these services.
+						</p>
+						<ul>
+						<li>Inaccuracies are everywhere</li>
+						<li>Sometimes the locations are not within the region specified</li>
+						<li>Generally requires some post processing</li>
+						</ul>
+					</section>
+					</section>
+				<section>
+					<section>
 						<h2>Databases</h2>
 						<p>
 							We have covered most of these in class already.
@@ -194,13 +309,13 @@
 					<section>
 						<h2>Features</h2>
 						<ul>
-						<li>Web Feature Service (WFS)</li>
-						<li>Web Map Service (WMS)</li>
-						<li>GeoWebCaching</li>
-						<li>Custom Layers and Styling</li>
-						<li>Custom Processing</li>
-						<li>Indexing on non-spatial and spatial attributes (PostGIS)</li>
-						<li>Many more...</li>
+							<li>Web Feature Service (WFS)</li>
+							<li>Web Map Service (WMS)</li>
+							<li>GeoWebCaching</li>
+							<li>Custom Layers and Styling</li>
+							<li>Custom Processing</li>
+							<li>Indexing on non-spatial and spatial attributes (PostGIS)</li>
+							<li>Many more...</li>
 						</ul>
 					</section>
 					<section>
@@ -216,18 +331,18 @@
 						</p>
 						<pre>
 							<code data-trim contenteditable>
-							SELECT      
-  st_FlipCoordinates(st_intersection(a.the_geom, b.the_geom))
-FROM
-  "opengeo"."VBMP_RCL_SHP" as a,
-  "opengeo"."VBMP_RCL_SHP" as b
-WHERE
-  a."SN_FULL" % '%primary_name%'
-    and b."SN_FULL" % '%secondary_name%'
-  AND ST_Touches(a.the_geom, b.the_geom)
-  AND a.fid != b.fid
-GROUP BY
-  st_FlipCoordinates(st_intersection(a.the_geom, b.the_geom))
+								SELECT      
+								st_FlipCoordinates(st_intersection(a.the_geom, b.the_geom))
+								FROM
+								"opengeo"."VBMP_RCL_SHP" as a,
+								"opengeo"."VBMP_RCL_SHP" as b
+								WHERE
+								a."SN_FULL" % '%primary_name%'
+								and b."SN_FULL" % '%secondary_name%'
+								AND ST_Touches(a.the_geom, b.the_geom)
+								AND a.fid != b.fid
+								GROUP BY
+								st_FlipCoordinates(st_intersection(a.the_geom, b.the_geom))
 							</code>
 						</pre>
 					</section>
@@ -238,14 +353,14 @@ GROUP BY
 						</p>
 						<pre>
 							<code data-trim contenteditable>
-							SELECT
-  a.fid, a."SN_FULL", a."VDOT_RNUM", st_flipcoordinates(st_buffer(a.the_geom,0.000000000001))  as the_geom
-FROM
-  "opengeo"."VBMP_RCL_SHP" as a
-WHERE
-  st_intersects(a.the_geom, st_buffer(st_pointfromtext('POINT(%lat_lon%)',4269), 0.0005))
-ORDER BY
-  st_distance(st_pointfromtext('POINT(%lat_lon%)',4269), a.the_geom)
+								SELECT
+								a.fid, a."SN_FULL", a."VDOT_RNUM", st_flipcoordinates(st_buffer(a.the_geom,0.000000000001))  as the_geom
+								FROM
+								"opengeo"."VBMP_RCL_SHP" as a
+								WHERE
+								st_intersects(a.the_geom, st_buffer(st_pointfromtext('POINT(%lat_lon%)',4269), 0.0005))
+								ORDER BY
+								st_distance(st_pointfromtext('POINT(%lat_lon%)',4269), a.the_geom)
 							</code>
 						</pre>
 					</section>
@@ -256,41 +371,41 @@ ORDER BY
 						</p>
 						<pre>
 							<code data-trim contenteditable>
-							var map = new Openlayers.Map('map');
-var rcl = new OpenLayers.Layer.WMS("RoadCenterLines", "//ogs_host_name/wms", {
-  layers : [
-    'opengeo:NHPN_STFIPS_51', 
-    'opengeo:SDE_VDOT_RTE_OVERLAP_LRS', 
-    'opengeo:VBMP_RCL_SHP0'
-  ],
-  format : 'image/png',
-  transparent : true
-}, {
-  isBaseLayer : false
-});
-map.addLayers([rcl]);
-							</code>
-							</pre>
-					</section>
-				</section>
+								var map = new Openlayers.Map('map');
+								var rcl = new OpenLayers.Layer.WMS("RoadCenterLines", "//ogs_host_name/wms", {
+								layers : [
+								'opengeo:NHPN_STFIPS_51', 
+								'opengeo:SDE_VDOT_RTE_OVERLAP_LRS', 
+								'opengeo:VBMP_RCL_SHP0'
+								],
+								format : 'image/png',
+								transparent : true
+							}, {
+							isBaseLayer : false
+						});
+						map.addLayers([rcl]);
+					</code>
+				</pre>
+			</section>
+		</section>
 
-<section>
-	<h1>THE END</h1>
-	<h3>By <a href="http://github.com/kschutt">Kyle Schutt</a> / <a href="http://twitter.com/kschutt">@kschutt</a></h3>
-</section>
-<section>
-	<h1>Links</h1>
-	<ul>
-		<li><a href="http://www.qgis.org/">Quantum GIS (QGIS)</a></li>
-		<li><a href="https://developers.google.com/maps/">Google Maps API</a></li>
-		<li><a href="http://www.microsoft.com/maps/">Bing Maps API</a></li>
-		<li><a href="http://wiki.openstreetmap.org/wiki/API">OpenStreetMaps API</a></li>
-		<li><a href="http://developer.mapquest.com/">MapQuest API</a></li>
-		<li><a href="http://boundlessgeo.com/">Boundless Geo (OpenGeo)</a></li>
-	</ul>
-</section>
+		<section>
+			<h1>THE END</h1>
+			<h3>By <a href="http://github.com/kschutt">Kyle Schutt</a> / <a href="http://twitter.com/kschutt">@kschutt</a></h3>
+		</section>
+		<section>
+			<h1>Links</h1>
+			<ul>
+				<li><a href="http://www.qgis.org/">Quantum GIS (QGIS)</a></li>
+				<li><a href="https://developers.google.com/maps/">Google Maps API</a></li>
+				<li><a href="http://www.microsoft.com/maps/">Bing Maps API</a></li>
+				<li><a href="http://wiki.openstreetmap.org/wiki/API">OpenStreetMaps API</a></li>
+				<li><a href="http://developer.mapquest.com/">MapQuest API</a></li>
+				<li><a href="http://boundlessgeo.com/">Boundless Geo (OpenGeo)</a></li>
+			</ul>
+		</section>
 
-</div>
+	</div>
 
 </div>
 
