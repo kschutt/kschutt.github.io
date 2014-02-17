@@ -265,9 +265,19 @@ private bool IsPointInPolygon(PointF point)
 						</p>
 						<pre><code>https://graph.facebook.com/search?type=location&amp;center=37.76,-122.427&amp;distance=1000</code></pre>
 						<p>
+							You can minimize the search area by also using a <code>place_id</code> parameter.
+						</p>
+						<p>
 						 Note: You will most likely still need to verify the locations found.
 						</p>
 					</section>
+					<section>
+						<h2>Facebook Query Language (FQL)</h2>
+						<p>
+						May be useful to narrow down the <code>place_id</code>'s that you require.
+						</p>
+						<pre><code>GET /fql?q=SELECT ... FROM place WHERE name like "%query%"</code></pre>
+						</section>
 					<section>
 						<h2>Foursquare API</h2>
 					</section>
